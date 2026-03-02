@@ -2,86 +2,162 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>LOVE LAB – I Say a Little Prayer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOVE LAB – Tony's English Classes</title>
 
 <style>
+:root{
+    --dark:#0E1D2E;
+    --light:#F4F4F4;
+    --accent:#FF6400;
+}
+
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
-    background:linear-gradient(135deg,#1e1e2f,#3a0ca3);
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:var(--dark);
     color:white;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden; /* 🔥 no scroll */
+}
+
+/* MAIN CONTAINER */
+
+.screen{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:3vh 4vw;
     text-align:center;
 }
 
+/* TYPOGRAPHY RESPONSIVA */
+
 h1{
-    margin-top:40px;
-    font-size:40px;
+    font-size:clamp(28px, 4vw, 52px);
+    margin-bottom:10px;
 }
 
-#card{
-    width:60%;
-    margin:40px auto;
-    padding:30px;
-    background:#2a2a40;
-    border-radius:20px;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
-    min-height:120px;
-    font-size:20px;
+h2{
+    font-size:clamp(18px, 2vw, 26px);
+    font-weight:300;
+    opacity:0.9;
 }
+
+p{
+    font-size:clamp(16px, 1.6vw, 22px);
+    line-height:1.6;
+}
+
+/* CARD */
+
+.card{
+    width:min(900px, 90%);
+    background:white;
+    color:var(--dark);
+    padding:clamp(25px, 3vw, 50px);
+    border-radius:20px;
+    font-size:clamp(20px, 2.2vw, 32px);
+    margin:4vh 0;
+    box-shadow:0 15px 50px rgba(0,0,0,0.4);
+}
+
+/* BUTTONS */
 
 button{
-    padding:15px 30px;
-    margin:15px;
+    padding:clamp(12px,1.5vw,18px) clamp(25px,2.5vw,40px);
+    font-size:clamp(16px,1.5vw,22px);
     border:none;
-    border-radius:30px;
-    font-size:18px;
+    border-radius:40px;
     cursor:pointer;
+    margin:10px;
     transition:0.3s;
 }
 
+button:hover{
+    transform:scale(1.08);
+}
+
+.start-btn{
+    background:var(--accent);
+    color:white;
+}
+
 .pro{
-    background:#06d6a0;
-    color:black;
+    background:#00c48c;
+    color:white;
 }
 
 .con{
-    background:#ef476f;
+    background:#ff4d6d;
+    color:white;
 }
 
-.next{
-    background:#ffd166;
-    color:black;
+.secondary{
+    background:white;
+    color:var(--dark);
 }
 
-button:hover{
-    transform:scale(1.1);
+.hidden{
+    display:none;
 }
 
-#result{
-    margin-top:20px;
-    font-size:18px;
-    opacity:0.9;
+/* FEEDBACK */
+
+#feedback{
+    margin-top:2vh;
+    font-size:clamp(18px,1.8vw,24px);
 }
 </style>
 </head>
 
 <body>
 
-<h1>💘 LOVE LAB</h1>
-<h3>I Say a Little Prayer – Conversation Challenge</h3>
+<!-- INTRO SCREEN -->
 
-<div id="card">
-Click "Start" to begin.
+<div id="intro" class="screen">
+    <h1>💘 LOVE LAB</h1>
+    <h2>I Say a Little Prayer – Conversation Experience</h2>
+
+    <p>
+        • Read the situation<br>
+        • Decide: Healthy or Unhealthy<br>
+        • Defend your answer<br>
+        • Give examples and opinions
+    </p>
+
+    <div>
+        <button class="start-btn" onclick="startGame()">Start Experience</button>
+        <button class="secondary" onclick="goHome()">Back</button>
+    </div>
 </div>
 
-<button class="next" onclick="nextScenario()">Start</button>
+<!-- GAME SCREEN -->
 
-<div id="buttons" style="display:none;">
-    <button class="pro" onclick="choose('Pro')">❤️ Pro</button>
-    <button class="con" onclick="choose('Con')">💔 Con</button>
+<div id="game" class="screen hidden">
+
+    <h1>⚖️ Healthy or Toxic?</h1>
+
+    <div id="scenario" class="card"></div>
+
+    <div>
+        <button class="pro" onclick="choose('Healthy')">❤️ Healthy</button>
+        <button class="con" onclick="choose('Unhealthy')">💔 Unhealthy</button>
+    </div>
+
+    <div id="feedback"></div>
+
 </div>
-
-<div id="result"></div>
 
 <script>
 
@@ -98,36 +174,49 @@ const scenarios = [
 "You lose focus on your own goals."
 ];
 
+const followUps = [
+"Why do you think that?",
+"Can you give a real example?",
+"Is this healthy long-term?",
+"Is this romantic or obsessive?",
+"What advice would you give this couple?",
+"Does this create emotional dependency?"
+];
+
 let current = 0;
+
+function startGame(){
+    document.getElementById("intro").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+    nextScenario();
+}
 
 function nextScenario(){
     if(current >= scenarios.length){
-        document.getElementById("card").innerHTML = "End of Love Lab 💘<br>Now discuss: Is love more positive or more dangerous?";
-        document.getElementById("buttons").style.display = "none";
+        document.getElementById("scenario").innerHTML =
+        "End of Love Lab 💘<br><br>Final Question:<br>Is the love in the song empowering or emotionally dependent?";
+        document.getElementById("feedback").innerHTML="";
         return;
     }
 
-    document.getElementById("card").innerHTML = scenarios[current];
-    document.getElementById("buttons").style.display = "block";
-    document.getElementById("result").innerHTML = "";
+    document.getElementById("scenario").innerHTML = scenarios[current];
+    document.getElementById("feedback").innerHTML="";
 }
 
 function choose(answer){
-    const followUps = [
-        "Why do you think that?",
-        "Can you give a real example?",
-        "Would you feel comfortable in that situation?",
-        "Do you agree with the idea of love in the song?",
-        "Is this healthy or unhealthy love?",
-        "What would you do differently?"
-    ];
 
     let randomQuestion = followUps[Math.floor(Math.random()*followUps.length)];
 
-    document.getElementById("result").innerHTML =
-    "You chose: <b>" + answer + "</b><br><br>Discussion Question:<br><i>" + randomQuestion + "</i>";
+    document.getElementById("feedback").innerHTML =
+    "You chose: <b>" + answer + "</b><br><br><i>" + randomQuestion + "</i>";
 
     current++;
+
+    setTimeout(nextScenario, 4000);
+}
+
+function goHome(){
+    window.location.href="../";
 }
 
 </script>
